@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noticia+Text:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>   
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="navbar">
+                <div class="d-flex align-items-center">
+                    
+                    <a href="#" class="logo">
+                        <img src="img/logo.png" alt="">
+                    </a>
+                    <ul class="navigation" id="navigation">
+                        <li><a href="#" id="politics" onclick="clickNews('politics')">Politics</a></li>
+                        <li><a href="#" id="sports" onclick="clickNews('sports')">Sports</a></li>
+                        <li><a href="#" id="business" onclick="clickNews('business')">Business</a></li>
+                        <li><a href="#" id="industry" onclick="clickNews('industry')">Industry</a></li>
+                        <a id="close-btn"><i class='bx bx-x' ></i></a>
+                    </ul>
+                </div>
+                <a href="#" class="mobile-nav" id="menu-toggle"><i class='bx bx-menu'></i></a>
+                <div class="search-bar">
+                    <input type="text" id="search-input" value="" placeholder="Search news...">
+                    <!-- <select id="language-select">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="pt">Portuguese</option>
+                       
+                    </select> -->
+                    <button id="searchBtn">Search</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section>
+        <div class="container">
+            <div class="category">
+                <h1><small class="text-muted">Your Have Searched :</small> <span id="searchType"></span>  </h1>
+            </div>
+            
+            <div id="newsWrapper">
+            
+            </div>
+        </div>
+    </section>
+    
+    
+    <script>
+        let key = "b0e1d1fe7f684cc1bbd4007c9b342923";
+        let searchBtn = document.getElementById("searchBtn");
+        let searchInput = document.getElementById("search-input");
+        let searchType = document.getElementById("searchType");
+
+const getNews = async (typeNews) => {
+    try {
+        let response = await fetch(`https://newsapi.org/v2/everything?q=${typeNews}&apiKey=${key}`);
+        if (!response.ok) throw new Error("Failed to fetch news articles");
+
+        let data = await response.json();
+        console.log(data);
+
+        const newsWrapper = document.getElementById("newsWrapper");
+        searchType.innerText = typeNews;
+        newsWrapper.innerHTML = "";
+
+        if (data.articles.length === 0) {
+            newsWrapper.innerHTML = "<p>No news articles found.</p>";
+            return;
+        }
+
+        data.articles.forEach(function (val) {
+            const divs = document.createElement("div");
+            divs.classList.add("card");
+            divs.innerHTML = `
+                <img src="${val.urlToImage || 'placeholder.jpg'}" alt="News Image">
+                <h2>${val.title}</h2>
+                <p>${val.description}</p>
+                <p><strong>Source:</strong> ${val.source.name}</p>
+                <a class="btn-read" href="${val.url}" target="_blank">View More</a>
+            `;
+            newsWrapper.appendChild(divs);
+        });
+    } catch (error) {
+        console.error("Error fetching news:", error);
+        document.getElementById("newsWrapper").innerHTML = "<h1>Sorry, unable to load news at the moment.</h1>";
+    }
+};
+
+searchBtn.addEventListener("click", () => {
+    let searchText = searchInput.value.trim();
+    if (searchText) {
+        getNews(searchText);
+        searchInput.value = "";
+    } else {
+        alert("Please enter a search term.");
+    }
+});
+
+window.addEventListener("load", () => {
+    getNews("India");
+});
+
+const clickNews = (navMenu) => {
+    getNews(navMenu);
+};
+
+
+document.getElementById("menu-toggle").addEventListener("click", function() {
+    let navigation = document.getElementById("navigation");
+    navigation.classList.add("open");
+});
+
+// Close the navigation
+document.getElementById("close-btn").addEventListener("click", function() {
+    let navigation = document.getElementById("navigation");
+    navigation.classList.remove("open");
+});
+
+// Close the navigation when clicking on any anchor link inside #navigation
+document.querySelectorAll("#navigation li a").forEach(link => {
+    link.addEventListener("click", function() {
+        let navigation = document.getElementById("navigation");
+        navigation.classList.remove("open");
+    });
+});
+
+   
+    </script>
+</body>
+</html>
